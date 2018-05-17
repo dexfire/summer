@@ -1,6 +1,8 @@
 package com.dexfire;
 
 import android.annotation.SuppressLint;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,8 +18,10 @@ import android.widget.Button;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private int lastRowForUndo = -1;
     private int allNum;
     private String TAG = "夏日祭";
+    
     private void resetData(){
         if(assureToResetData){
             assureToResetData = false;
@@ -76,9 +81,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int makeARow(){
+        Random random = new Random(System.currentTimeMillis());
         int[] remain = getRemainLevelNum();
         if(remain.length>0 && remain[remain.length-1]>0){
-            int result = (int) (Math.random()* (remain[remain.length-1]-1+0.5f))+1 ;
+            int result = random.nextInt(remain[remain.length-1]) + 1;
             int i;
             for(i=0;i<remain.length;i++){
                 if(result<=remain[i] & result !=0) break;
@@ -221,7 +227,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //mVideoView.setVideoURI(Uri.parse());
-        mVideoView.setVideoPath("file:///android_assets/video_back.mp4");
+        mVideoView.setVideoURI(Uri.parse("android.resource://"+getPackageName()+ "/"+R.raw.video_back));
+        mVideoView.start();
+
+        mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mVideoView.start();
+            }
+        });
         delayedHide(AUTO_HIDE_DELAY_MILLIS);
     }
 
