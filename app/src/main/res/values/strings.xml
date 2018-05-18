@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">夏日祭抽奖箱</string>
-
+    <string name="app_name">✡ 夏日祭抽奖箱</string>
     <string name="dummy_button">这是个假的按钮</string>
     <string name="dummy_content">抽奖\n抽去吧，反正你是抽不中的</string>
 </resources>

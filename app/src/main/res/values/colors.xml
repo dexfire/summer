@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#AF41B5</color>
-    <color name="colorPrimaryDark">#663F9F</color>
+    <color name="colorPrimary">#FA2AAA</color>
+    <color name="colorPrimaryDark">#E63F5F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="black_overlay">#66000000</color>
-    <color name="background_color">#AAff4466</color>
+    <color name="background_color">#ffaaaaaa</color>
     <color name="color_circle">#66000000</color>
     <color name="color_circle_stroke_fill">#99FFFFFF</color>
     <color name="color_circle_start">#88FFFFFF</color>
     <color name="color_circle_end">#66FFFFFF</color>
+    <color name="color_light_white">#AAFF3655</color>
+    <color name="toolbar_background">#00ffffff</color>
 </resources>

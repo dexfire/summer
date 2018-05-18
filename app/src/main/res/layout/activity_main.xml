@@ -2,18 +2,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color"
-    tools:context="com.dexfire.MainActivity">
-
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
-
-    <!-- This FrameLayout insets its children based on system windows using
-         android:fitsSystemWindows. -->
-
+    android:background="@mipmap/back"
+    android:theme="@style/FullscreenActionBarStyle"
+    tools:context="com.dexfire.MainActivity"
+    android:fitsSystemWindows="true">
+    <Toolbar
+        android:id="@+id/toolbar"
+        android:background="@color/toolbar_background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
     <VideoView
         android:id="@+id/videoView"
+        android:layout_gravity="bottom"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:soundEffectsEnabled="true" />
@@ -24,34 +24,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@mipmap/circle"
-        android:text="抽奖" />
+        android:textSize="@dimen/dimen_row_font_size"
+        android:textColor="@color/color_light_white"
+        android:text="抽奖\n来一发"
+        android:hint="反正也是不可能抽中的"/>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
-
-        <LinearLayout
-            android:id="@+id/fullscreen_content_controls"
-            style="?metaButtonBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:background="@color/black_overlay"
-            android:orientation="horizontal"
-            tools:ignore="UselessParent">
-
-            <Button
-                android:id="@+id/dummy_button"
-                style="?metaButtonBarButtonStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/dummy_button" />
-
-        </LinearLayout>
-
-
-    </FrameLayout>
 
 </FrameLayout>

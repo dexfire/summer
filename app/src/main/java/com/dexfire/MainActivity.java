@@ -1,10 +1,15 @@
 package com.dexfire;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -13,24 +18,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
+import android.view.WindowManager;
+import android.view.animation.AnimationSet;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Toast;
+import android.widget.Toolbar;
 import android.widget.VideoView;
-
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     //private View mContentView;
     private static final boolean AUTO_HIDE = true;
     private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
-
     private VideoView mVideoView;
     private ArrayList<HashMap<String,Object>> list = new ArrayList<>();
     private boolean assureToResetData = false;
@@ -38,14 +43,29 @@ public class MainActivity extends AppCompatActivity {
     private int lastRowForUndo = -1;
     private int allNum;
     private String TAG = "夏日祭";
-    
+    private boolean rowing = false;
+    private AnimatorSet anim_fade_away;
+    //private Image
+
     private void resetData(){
         if(assureToResetData){
-            assureToResetData = false;
-            addPrizes("一等奖 - 萌妹纸亲手挑选的♂本子",R.drawable.ic_launcher_background,3);
-            addPrizes("二等奖 - 萌妹纸亲手挑选的♂本子",R.drawable.ic_launcher_background,20);
-            addPrizes("三等奖 - 来历不明的钥匙链",R.drawable.ic_launcher_background,50);
-            Toast.makeText(this,"报告舰长！！\n少女填装完毕！！",Toast.LENGTH_LONG).show();
+            new AlertDialog.Builder(this).setTitle("确认要重置数据吗？").setCancelable(true).setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    assureToResetData = false;
+                    list.clear();
+                    addPrizes("一等奖 - lovelive 亚克力摆件",R.drawable.ic_launcher_background,2);
+                    addPrizes("二等奖 - 某萌妹纸挑选的♂本子",R.drawable.ic_launcher_background,10);
+                    addPrizes("三等奖 - 来历不明的卡贴",R.drawable.ic_launcher_background,30);
+                    addPrizes("没有中奖呢~\n\n送你一朵小花花吧~ ✿ ",R.drawable.ic_launcher_background,30);
+                    Toast.makeText(MainActivity.this,"报告舰长！！\n少女填装完毕！！",Toast.LENGTH_LONG).show();
+                }
+            }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            }).show();
         }else{
             assureToResetData = true;
             Toast.makeText(this,"高能警告！！\n再点一次重置来确认操作！！",Toast.LENGTH_LONG).show();
@@ -80,6 +100,10 @@ public class MainActivity extends AppCompatActivity {
         return remain;
     }
 
+    private void switchCurrentPrizeImg(){
+
+    }
+
     private int makeARow(){
         Random random = new Random(System.currentTimeMillis());
         int[] remain = getRemainLevelNum();
@@ -90,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 if(result<=remain[i] & result !=0) break;
             }
             HashMap<String,Object> prize = list.get(i);
-            if((int)prize.get(REMAIM)<=1){
+            if((int)prize.get(REMAIM)<1){
                 return makeARow();      // 以防万一算错了，没了就重新Row
 //                Toast.makeText(this,((String)prize.get(NAME))+"用光了。\n",Toast.LENGTH_LONG).show();
 //                checkPrintRemain();
@@ -98,8 +122,8 @@ public class MainActivity extends AppCompatActivity {
             prize.put(REMAIM,(int)prize.get(REMAIM)-1);
             list.set(i,prize);          // 直行更改到列表
             Toast.makeText(this,"(●´∀｀●) 恭喜获奖\n\n\n♥ "+(String)prize.get(NAME)+" ♥",Toast.LENGTH_LONG).show();
-            lastRowForUndo = result;
-            return result;
+            lastRowForUndo = i;
+            return i;
         }else{
             Toast.makeText(this,"o(╯□╰)o，\n   奖品都没了，收摊回家吧~\n",Toast.LENGTH_LONG).show();
             return -1;
@@ -109,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
     private void undoRow(){
         if(lastRowForUndo>=0 && lastRowForUndo <list.size()){
             list.get(lastRowForUndo).put(REMAIM,(int)(list.get(lastRowForUndo).get(REMAIM))+1);
+            lastRowForUndo=-1;
             Toast.makeText(this,"时间啊，逆转吧！！！\n   你成功撤销了一次抽奖\n(⊙_⊙;)\n",Toast.LENGTH_LONG).show();
         }
 
@@ -125,8 +150,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkPrintRemain(){
+
         String report = "余量报告:\n";
-        int[] rem = getRemainNum();
+
+        if(lastRowForUndo!=-1 && lastRowForUndo< list.size())
+            report+="上次获奖信息\n"+list.get(lastRowForUndo).get(NAME)+"\n\n";
+
+        int[] rem = getRemainLevelNum();
 
         int remain = rem.length <= 0 ? 0: rem[rem.length-1];
 
@@ -146,34 +176,17 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this,report,Toast.LENGTH_LONG).show();
     }
 
-    private final Runnable mHidePart2Runnable = new Runnable() {
-        @SuppressLint("InlinedApi")
-        @Override
-        public void run() {
-            // Delayed removal of status and navigation bar
-
-            // Note that some of these constants are new as of API 16 (Jelly Bean)
-            // and API 19 (KitKat). It is safe to use them, as they are inlined
-            // at compile-time and do nothing on earlier devices.
-//            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-//                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-//                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-//                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
-    };
-    private View mControlsView;
+    //private View mControlsView;
     private Button mButtonRow;
     private final Runnable mShowPart2Runnable = new Runnable() {
         @Override
         public void run() {
             // Delayed display of UI elements
-            ActionBar actionBar = getSupportActionBar();
+            ActionBar actionBar = getActionBar();
             if (actionBar != null) {
                 actionBar.show();
             }
-            mControlsView.setVisibility(View.VISIBLE);
+            //mControlsView.setVisibility(View.VISIBLE);
         }
     };
     private boolean mVisible;
@@ -201,42 +214,52 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-
         mVisible = true;
-        mControlsView = findViewById(R.id.fullscreen_content_controls);
+        show();
+        Toolbar tool = findViewById(R.id.toolbar);
+        setActionBar(tool);
+        anim_fade_away = (AnimatorSet)(AnimatorInflater.loadAnimator(this,R.anim.anim_scale_fade_out));
         mVideoView = findViewById(R.id.videoView);
         mButtonRow=findViewById(R.id.ButtonRow);
-//        // Set up the user interaction to manually show or hide the system UI.
-//        mContentView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                toggle();
-//            }
-//        });
-
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+        mButtonRow.setHeight(mButtonRow.getWidth());
         mButtonRow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 makeARow();
+                anim_fade_away.setTarget(v);
+                anim_fade_away.start();
             }
         });
-        //mVideoView.setVideoURI(Uri.parse());
         mVideoView.setVideoURI(Uri.parse("android.resource://"+getPackageName()+ "/"+R.raw.video_back));
         mVideoView.start();
-
         mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 mVideoView.start();
             }
         });
-        delayedHide(AUTO_HIDE_DELAY_MILLIS);
+        anim_fade_away.setTarget(mButtonRow);
+        anim_fade_away.start();
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        mVideoView.setVideoURI(Uri.parse("android.resource://"+getPackageName()+ "/"+R.raw.video_back));
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onStart() {
+        mVideoView.start();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        mVideoView.pause();
+        super.onStop();
     }
 
     @Override
@@ -259,16 +282,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void hide() {
         // Hide UI first
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             actionBar.hide();
         }
-        mControlsView.setVisibility(View.GONE);
+        //mControlsView.setVisibility(View.GONE);
         mVisible = false;
 
         // Schedule a runnable to remove the status and navigation bar after a delay
         mHideHandler.removeCallbacks(mShowPart2Runnable);
-        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
     }
 
     @SuppressLint("InlinedApi")
@@ -279,7 +301,6 @@ public class MainActivity extends AppCompatActivity {
         mVisible = true;
 
         // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(mHidePart2Runnable);
         mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
     }
 
@@ -292,13 +313,23 @@ public class MainActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
+    private Runnable mRealRow = new Runnable(){
+
+        @Override
+        public void run() {
+
+        }
+    };
+
+    private void realRow(){
+
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add("查询").setIcon(android.R.drawable.ic_menu_info_details).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                if(lastRowForUndo!=-1 && lastRowForUndo< list.size())
-                Toast.makeText(MainActivity.this,"上次获奖信息\n\n"+list.get(lastRowForUndo).get(NAME),Toast.LENGTH_LONG).show();
                 checkPrintRemain();
                 return true;
             }
@@ -331,4 +362,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
+
 }

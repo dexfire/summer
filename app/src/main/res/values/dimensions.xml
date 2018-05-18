@@ -2,4 +2,5 @@
 <resources>
     <dimen name="dimen_circle_inner_radius">150dp</dimen>
     <dimen name="dimen_circle_outer_radius">153dp</dimen>
+    <dimen name="dimen_row_font_size">16sp</dimen>
 </resources>
