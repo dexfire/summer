@@ -11,12 +11,19 @@
         android:background="@color/toolbar_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
     <VideoView
         android:id="@+id/videoView"
         android:layout_gravity="bottom"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:soundEffectsEnabled="true" />
+
+    <com.mikhaellopez.circularimageview.CircularImageView
+        android:id="@+id/circularimageview"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center"/>
 
     <Button
         android:id="@+id/ButtonRow"
